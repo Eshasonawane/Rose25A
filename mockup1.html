@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CellStart - ChronoNAD+ | Unlock Your Cellular Potential</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: #0057a6;
+      background: #f8fafc;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #0057a6 0%, #002f5c 100%);
+      color: white;
+      padding: 1rem 0;
+      position: relative;
+      /* keep overflow only if needed — dropdown is fixed so it won't be clipped */
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'Arial', sans-serif;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: white;
+    }
+
+    .nav-cart-container {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav { display: flex; gap: 2rem; }
+
+    .nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .nav a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background: #b3e5fc;
+      transition: width 0.3s ease;
+    }
+
+    .nav a:hover::after { width: 100%; }
+
+    /* Mini Cart Styles */
+    .mini-cart { position: relative; display:flex; align-items:center; gap:12px; }
+
+    .cart-toggle {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid #b3e5fc;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .cart-toggle:hover {
+      background: #b3e5fc;
+      color: #002f5c;
+    }
+
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4444;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    /* Now dropdown is fixed (moved out of header) so it won't be clipped */
+    .cart-dropdown {
+      position: fixed;
+      top: 80px; /* adjust if header height changes */
+      right: 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      width: 350px;
+      max-height: 400px;
+      z-index: 2000;
+      display: none;
+      border: 1px solid #e0e0e0;
+    }
+
+    /* Slightly shift on small screens */
+    @media (max-width: 768px) {
+      .cart-dropdown { right: 16px; left: 16px; width: auto; top: 72px; }
+    }
+
+    .cart-dropdown.show { display: block; animation: slideDown 0.25s ease; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .cart-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e0e0e0;
+      color: #002f5c;
+      font-weight: bold;
+      background: #f8fafc;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .cart-items {
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+    }
+
+    .cart-item-image {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #e3f2fd, #f8fafc);
+      border-radius: 8px;
+      margin-right: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .cart-item-details { flex: 1; }
+
+    .cart-item-name { font-weight: 600; margin-bottom: 0.25rem; font-size: 0.9rem; }
+
+    .cart-item-price { color: #0057a6; font-size: 0.85rem; margin-bottom: 0.5rem; }
+
+    .quantity-controls { display: flex; align-items: center; gap: 0.5rem; }
+
+    .quantity-btn {
+      width: 24px; height: 24px; border: 1px solid #ddd; background: white;
+      border-radius: 4px; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 0.8rem; font-weight: bold;
+    }
+
+    .quantity-btn:hover { background: #f0f0f0; }
+
+    .quantity { font-weight: bold; min-width: 20px; text-align: center; font-size: 0.9rem; }
+
+    .cart-empty { padding: 2rem; text-align: center; color: #666; font-style: italic; }
+
+    .cart-footer {
+      padding: 1rem; border-top: 1px solid #e0e0e0; background: #f8fafc; border-radius: 0 0 12px 12px;
+    }
+
+    .cart-total { display: flex; justify-content: space-between; margin-bottom: 1rem; font-weight: bold; color: #002f5c; font-size: 1.1rem; }
+
+    .checkout-btn {
+      width: 100%; padding: 0.75rem; background: linear-gradient(45deg, #0057a6, #002f5c);
+      color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease; font-size: 1rem;
+    }
+
+    .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 87, 166, 0.3); }
+
+    /* Product Carousel Styles */
+    .carousel-section { padding: 6rem 0; background: linear-gradient(135deg, #f8fafc 0%, #e3f2fd 100%); }
+
+    .carousel-container { position: relative; overflow: hidden; margin-top: 2rem; }
+
+    .carousel-track { display: flex; transition: transform 0.5s ease; gap: 2rem; }
+
+    .product-card {
+      flex: 0 0 300px; background: white; border-radius: 20px; padding: 2rem;
+      text-align: center; box-shadow: 0 8px 25px rgba(0, 87, 166, 0.1); transition: all 0.3s ease;
+      border: 1px solid #e1f5fe;
+    }
+
+    .product-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(0, 87, 166, 0.15); }
+
+    .product-card-image {
+      width: 120px; height: 120px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #e3f2fd, #f8fafc);
+      border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #0057a6;
+    }
+
+    .product-card h3 { font-size: 1.4rem; font-weight: bold; color: #002f5c; margin-bottom: 1rem; }
+
+    .product-card p { color: #666; margin-bottom: 1.5rem; font-size: 0.9rem; line-height: 1.4; }
+
+    .product-price { font-size: 1.8rem; font-weight: bold; color: #0057a6; margin-bottom: 1.5rem; }
+
+    .add-to-cart-btn {
+      background: linear-gradient(45deg, #0057a6, #002f5c); color: white; border: none;
+      padding: 0.75rem 1.5rem; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; font-size: 1rem;
+    }
+
+    .add-to-cart-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 87, 166, 0.3); }
+
+    .carousel-nav { display: flex; justify-content: center; gap: 1rem; margin-top: 2rem; }
+
+    .carousel-btn {
+      width: 50px; height: 50px; border: 2px solid #0057a6; background: white; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #0057a6; transition: all 0.3s ease;
+    }
+
+    .carousel-btn:hover { background: #0057a6; color: white; }
+
+    /* Hero Section */
+    .hero { background: linear-gradient(135deg, #0057a6 0%, #002f5c 100%); color: white; padding: 6rem 0; position: relative; overflow: hidden; }
+
+    .hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; position: relative; z-index: 2; }
+
+    .hero-text h1 { font-size: 3.5rem; font-weight: bold; margin-bottom: 1.5rem; line-height: 1.2; }
+
+    .hero-text p { font-size: 1.3rem; margin-bottom: 2rem; opacity: 0.9; }
+
+    .cta-buttons { display: flex; gap: 1rem; }
+
+    .btn { padding: 1rem 2rem; border: none; border-radius: 50px; font-size: 1.1rem; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; transition: all 0.3s ease; }
+
+    .btn-primary { background: linear-gradient(45deg, #b3e5fc, #81d4fa); color: #002f5c; box-shadow: 0 4px 20px rgba(179, 229, 252, 0.3); }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 25px rgba(179, 229, 252, 0.4); }
+
+    .btn-secondary { background: transparent; color: white; border: 2px solid #b3e5fc; }
+
+    .btn-secondary:hover { background: #b3e5fc; color: #002f5c; }
+
+    .hero-visual { position: relative; }
+
+    .product-showcase {
+      background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 2rem; text-align: center; border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .product-image { width: 200px; height: 200px; background: rgba(255,255,255,0.1); border-radius: 20px; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; color: white; animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0%,100%{ transform: scale(1);} 50%{ transform: scale(1.05);} }
+
+    /* Science Section */
+    .science-section { background: white; padding: 6rem 0; }
+
+    .section-header { text-align: center; margin-bottom: 4rem; }
+
+    .section-header h2 { font-size: 2.8rem; font-weight: bold; color: #002f5c; margin-bottom: 1rem; }
+
+    .section-header p { font-size: 1.2rem; color: #0057a6; max-width: 600px; margin: 0 auto; }
+
+    .science-infographic { max-width: 600px; margin: 2rem auto; background: #f0f8ff; padding: 2rem; border-radius: 15px; color: #002f5c; }
+
+    /* Benefits Section */
+    .benefits-section { padding: 6rem 0; background: linear-gradient(135deg, #e3f2fd 0%, #f8fafc 100%); }
+
+    .benefits-content { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+
+    .benefits-text h2 { font-size: 2.5rem; font-weight: bold; color: #002f5c; margin-bottom: 1.5rem; }
+
+    .benefits-list { list-style: none; padding: 0; margin: 2rem 0; }
+
+    .benefits-list li { margin: 1rem 0; padding-left: 2rem; position: relative; }
+
+    .benefits-list li span { position: absolute; left: 0; color: #0057a6; font-weight: bold; }
+
+    .nad-chart-image { max-width: 500px; width: 100%; background: #f0f8ff; padding: 2rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,47,92,0.1); }
+
+    /* CTA Section */
+    .cta-section { padding: 6rem 0; background: linear-gradient(135deg, #002f5c 0%, #0057a6 100%); color: white; text-align: center; }
+
+    .cta-content h2 { font-size: 3rem; font-weight: bold; margin-bottom: 1.5rem; }
+
+    .cta-content p { font-size: 1.3rem; margin-bottom: 2.5rem; }
+
+    /* Footer */
+    footer { background: #001a2e; color: white; padding: 3rem 0 1rem; }
+
+    .footer-content { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+
+    .footer-section h3 { font-size: 1.3rem; margin-bottom: 1rem; color: #b3e5fc; }
+
+    .footer-section p, .footer-section a { color: #ccc; text-decoration: none; line-height: 1.8; }
+
+    .footer-section a:hover { color: #b3e5fc; }
+
+    .footer-bottom { border-top: 1px solid #333; padding-top: 1rem; text-align: center; color: #999; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-content, .benefits-content { grid-template-columns: 1fr; gap: 2rem; }
+      .hero-text h1 { font-size: 2.5rem; }
+      .nav { display: none; }
+      .product-card { flex: 0 0 280px; }
+      .cta-buttons { flex-direction: column; align-items: center; }
+      .section-header h2 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+            <img src="img/logo.png" alt="CellStart Logo" />
+        </div>
+        <div class="nav-cart-container">
+          <nav class="nav">
+            <a href="#science">Science</a>
+            <a href="#benefits">Benefits</a>
+            <a href="#products">Products</a>
+            <a href="#contact">Contact</a>
+          </nav>
+
+          <div class="mini-cart" id="miniCart">
+            <div class="cart-toggle" id="cartToggle" onclick="toggleCart()">
+              🛒
+              <span class="cart-count" id="cartCount">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CART DROPDOWN - moved outside header and fixed positioned -->
+  <div class="cart-dropdown" id="cartDropdown" aria-hidden="true">
+    <div class="cart-header">Shopping Cart</div>
+    <div class="cart-items" id="cartItems">
+      <div class="cart-empty">Your cart is empty</div>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display: none;">
+      <div class="cart-total">
+        <span>Total: <span id="cartTotal">$0.00</span></span>
+      </div>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <div class="hero-text">
+          <h1>Unlock Your Cellular Potential</h1>
+          <p>ChronoNAD+ is a revolutionary dietary supplement designed to restore your NAD+ levels, helping you feel more vibrant and energized as you age.</p>
+          <div class="cta-buttons">
+            <a href="#products" class="btn btn-primary">Shop Now</a>
+            <a href="#science" class="btn btn-secondary">Learn More</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="product-showcase">
+            <div class="product-image">🧬</div>
+            <h3>ChronoNAD+</h3>
+            <p>Your cellular fuel for longevity</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Science Section -->
+  <section id="science" class="science-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Why Is NAD+ Your Cellular Fuel?</h2>
+        <p>Understanding the science behind cellular energy and longevity</p>
+      </div>
+      <div class="science-infographic">
+        <h3>NAD+ Powers Your Cells</h3>
+        <p>NAD+ (Nicotinamide Adenine Dinucleotide) is a crucial coenzyme found in every cell of your body. It plays a vital role in:</p>
+        <ul style="text-align: left; margin: 1rem 0; padding-left: 1rem;">
+          <li>• Energy production in mitochondria</li>
+          <li>• DNA repair mechanisms</li>
+          <li>• Cellular communication</li>
+          <li>• Stress response pathways</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section id="benefits" class="benefits-section">
+    <div class="container">
+      <div class="benefits-content">
+        <div class="benefits-text">
+          <h2>The 1.7x Advantage</h2>
+          <p>Research shows that combining NAD+ with Resveratrol can boost NAD+ levels in our body up to 1.7x higher than using NAD+ alone.</p>
+          <ul class="benefits-list">
+            <li><span>✓</span>Enhanced cellular energy production</li>
+            <li><span>✓</span>Improved DNA repair mechanisms</li>
+            <li><span>✓</span>Better cellular defense systems</li>
+            <li><span>✓</span>Supports healthy aging process</li>
+          </ul>
+          <a href="#products" class="btn btn-primary">Discover The Formula</a>
+        </div>
+        <div class="benefits-visual">
+          <div class="nad-chart-image">
+            <h3>NAD+ Levels Decline With Age</h3>
+            <div style="display: flex; justify-content: space-between; margin: 2rem 0;">
+              <div style="text-align: center;">
+                <div style="height: 100px; width: 50px; background: linear-gradient(to top, #0057a6, #b3e5fc); margin: 0 auto 0.5rem; border-radius: 4px;"></div>
+                <p><strong>Age 20</strong><br>100%</p>
+              </div>
+              <div style="text-align: center;">
+                <div style="height: 70px; width: 50px; background: linear-gradient(to top, #0057a6, #b3e5fc); margin: 0 auto 0.5rem; border-radius: 4px;"></div>
+                <p><strong>Age 40</strong><br>70%</p>
+              </div>
+              <div style="text-align: center;">
+                <div style="height: 40px; width: 50px; background: linear-gradient(to top, #0057a6, #b3e5fc); margin: 0 auto 0.5rem; border-radius: 4px;"></div>
+                <p><strong>Age 60</strong><br>40%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Carousel Section -->
+  <section id="products" class="carousel-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Our Products</h2>
+        <p>Premium supplements backed by science for your cellular wellness journey</p>
+      </div>
+
+      <div class="carousel-container">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="product-card">
+            <div class="product-card-image">
+                <img src="img/product.png" alt="ChronoNAD+">
+            </div>
+            <h3>ChronoNAD+</h3>
+            <p>Revolutionary NAD+ supplement with Resveratrol for cellular energy and longevity support</p>
+            <div class="product-price">$34.99</div>
+            <button class="add-to-cart-btn" onclick="addToCart('ChronoNAD+', 34.99, '🧬', this)">
+              Add to Cart
+            </button>
+          </div>
+
+          <div class="product-card">
+            <div class="product-card-image"></div>
+            <h3>Genomics Testing Kit</h3>
+            <p>Comprehensive DNA analysis to understand your genetic predisposition and optimize your health</p>
+            <div class="product-price">$199.99</div>
+            <button class="add-to-cart-btn" onclick="addToCart('Genomics Testing Kit', 199.99, '🧪', this)">
+              Add to Cart
+            </button>
+          </div>
+
+          <div class="product-card">
+            <div class="product-card-image">
+              <img src="img/product2.jpg" alt="Testing Kit">
+            </div>
+            <h3>Cellular Support Bundle</h3>
+            <p>Complete cellular wellness package combining ChronoNAD+ with essential co-factors</p>
+            <div class="product-price">$89.99</div>
+            <button class="add-to-cart-btn" onclick="addToCart('Cellular Support Bundle', 89.99, '💊', this)">
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-nav">
+        <button class="carousel-btn" id="prevBtn" onclick="moveCarousel(-1)">❮</button>
+        <button class="carousel-btn" id="nextBtn" onclick="moveCarousel(1)">❯</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <h2>Fuel My Cells</h2>
+        <p>Ready to unlock your cellular potential and restore your vitality? Experience the power of ChronoNAD+ today.</p>
+        <div class="cta-buttons">
+          <a href="#products" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 2.5rem;">Shop ChronoNAD+</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>CellStart</h3>
+          <p>Empowering your journey to cellular wellness and longevity through scientifically-backed supplements.</p>
+        </div>
+        <div class="footer-section">
+          <h3>Product</h3>
+          <p><a href="#">ChronoNAD+</a></p>
+          <p><a href="#">How it Works</a></p>
+          <p><a href="#">Research</a></p>
+        </div>
+        <div class="footer-section">
+          <h3>Support</h3>
+          <p><a href="#">Contact Us</a></p>
+          <p><a href="#">FAQ</a></p>
+          <p><a href="#">Shipping Info</a></p>
+        </div>
+        <div class="footer-section">
+          <h3>Legal</h3>
+          <p><a href="#">Privacy Policy</a></p>
+          <p><a href="#">Terms of Service</a></p>
+          <p><a href="#">Refund Policy</a></p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 CellStart. All rights reserved. | *These statements have not been evaluated by the FDA.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Cart functionality
+    let cart = [];
+    let isCartOpen = false;
+
+    function toggleCart() {
+      const dropdown = document.getElementById('cartDropdown');
+      isCartOpen = !isCartOpen;
+      if (isCartOpen) {
+        dropdown.classList.add('show');
+        dropdown.setAttribute('aria-hidden', 'false');
+      } else {
+        dropdown.classList.remove('show');
+        dropdown.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    // Now addToCart receives the clicked button element as last param (button)
+    function addToCart(name, price, icon, button) {
+      const existingItem = cart.find(item => item.name === name);
+
+      if (existingItem) {
+        existingItem.quantity += 1;
+      } else {
+        cart.push({
+          name: name,
+          price: price,
+          icon: icon,
+          quantity: 1
+        });
+      }
+
+      updateCartDisplay();
+
+      // Show success animation on the clicked button
+      if (button) {
+        const originalText = button.textContent;
+        const originalBg = button.style.background;
+        button.textContent = '✓ Added!';
+        button.style.background = '#4CAF50';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.background = originalBg;
+        }, 1500);
+      }
+    }
+
+    function updateQuantity(name, change) {
+      const item = cart.find(item => item.name === name);
+      if (item) {
+        item.quantity += change;
+        if (item.quantity <= 0) {
+          removeFromCart(name);
+        } else {
+          updateCartDisplay();
+        }
+      }
+    }
+
+    function removeFromCart(name) {
+      cart = cart.filter(item => item.name !== name);
+      updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+      const cartCount = document.getElementById('cartCount');
+      const cartItems = document.getElementById('cartItems');
+      const cartFooter = document.getElementById('cartFooter');
+      const cartTotal = document.getElementById('cartTotal');
+
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+      // Update cart count badge
+      cartCount.textContent = totalItems;
+      if (totalItems > 0) {
+        cartCount.style.display = 'flex';
+      } else {
+        cartCount.style.display = 'none';
+      }
+
+      // Update cart items display
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="cart-empty">Your cart is empty</div>';
+        cartFooter.style.display = 'none';
+      } else {
+        cartItems.innerHTML = cart.map(item => `
+          <div class="cart-item">
+            <div class="cart-item-image">${item.icon}</div>
+            <div class="cart-item-details">
+              <div class="cart-item-name">${item.name}</div>
+              <div class="cart-item-price">$${item.price.toFixed(2)} each</div>
+              <div class="quantity-controls">
+                <button class="quantity-btn" onclick="updateQuantity('${item.name.replace(/'/g,"\\'")}', -1)">−</button>
+                <span class="quantity">${item.quantity}</span>
+                <button class="quantity-btn" onclick="updateQuantity('${item.name.replace(/'/g,"\\'")}', 1)">+</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+
+        cartFooter.style.display = 'block';
+        cartTotal.textContent = `$${totalPrice.toFixed(2)}`;
+      }
+    }
+
+    // Carousel functionality
+    let currentSlide = 0;
+    const totalSlides = 3;
+    function moveCarousel(direction) {
+      currentSlide += direction;
+      if (currentSlide >= totalSlides) currentSlide = 0;
+      else if (currentSlide < 0) currentSlide = totalSlides - 1;
+
+      const track = document.getElementById('carouselTrack');
+      const slideWidth = 320; // card width + gap (adjust if you change card/gap)
+      track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+    }
+
+    // Auto-advance carousel every 5 seconds
+    setInterval(() => { moveCarousel(1); }, 5000);
+
+    // Close cart when clicking outside: check both the cart toggle and the dropdown
+    document.addEventListener('click', function(event) {
+      const dropdown = document.getElementById('cartDropdown');
+      const cartToggle = document.getElementById('cartToggle');
+      const clickedInsideDropdown = dropdown.contains(event.target);
+      const clickedToggle = cartToggle.contains(event.target);
+
+      if (!clickedInsideDropdown && !clickedToggle && isCartOpen) {
+        dropdown.classList.remove('show');
+        dropdown.setAttribute('aria-hidden', 'true');
+        isCartOpen = false;
+      }
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Initialize cart display
+    updateCartDisplay();
+  </script>
+</body>
+</html>
